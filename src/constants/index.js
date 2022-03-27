@@ -1,5 +1,5 @@
 export const TokenCrossChainContractAddress =
-  "0x4d792140ede59611E42cd31c2da059A6a18b52D0";
+  "0xDa3DeB342Cc4D6aD0D607F307Ecf0932f3667Ade";
 
 /********** base **********/
 export const DAOAddress = "0xc096332CAacF00319703558988aD03eC6586e704";

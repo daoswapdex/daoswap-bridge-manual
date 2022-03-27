@@ -441,13 +441,13 @@ export default {
         ? weiToEther(
             JSBI.greaterThanOrEqual(remainingApplyAmount, JSBI.BigInt(0))
               ? remainingApplyAmount.toString()
-              : 0,
+              : "0",
             this.web3
           )
         : weiToEther(
             JSBI.greaterThanOrEqual(enableApplyAmount, JSBI.BigInt(0))
               ? enableApplyAmount.toString()
-              : 0,
+              : "0",
             this.web3
           );
     },
