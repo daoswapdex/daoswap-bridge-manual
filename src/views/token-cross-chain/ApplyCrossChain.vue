@@ -125,7 +125,7 @@
             :color="operationResult.color"
             centered
             top
-            timeout="4000"
+            timeout="5000"
           >
             {{ $t(operationResult.text) }}
           </v-snackbar>
@@ -287,25 +287,11 @@ export default {
     async getInfo() {
       this.loading = true;
       try {
-        // await this.getAccountAssets();
         await this.getContractInfo();
       } catch (error) {
         console.info(error);
       }
       this.loading = false;
-    },
-    // 获取账号信息
-    async getAccountAssets() {
-      // // 查询当前账号余额
-      // const contractERC20DAO = getContract(ERC20DAO, DAOAddress, this.web3);
-      // const balance = await contractERC20DAO.methods
-      //   .balanceOf(this.address)
-      //   .call();
-      // const allowance = await contractERC20DAO.methods
-      //   .allowance(this.address, TokenCrossChainContractAddress)
-      //   .call();
-      // this.accountAssets.balance = weiToEther(balance, this.web3);
-      // this.accountAssets.allowanceAmount = weiToEther(allowance, this.web3);
     },
     // 获取合约信息
     async getContractInfo() {
@@ -328,77 +314,21 @@ export default {
       this.accountAssets.balance = weiToEther(balance, this.web3);
       this.accountAssets.allowanceAmount = weiToEther(allowance, this.web3);
       this.tokenSymbol = await contractERC20.methods.symbol().call();
-      // get current day timestamp
-      this.currentDayTimestamp = await contract.methods
-        .getCurrentDayTimestamp()
-        .call();
-      // get apply amount limit
-      // 最大每日限额 = 计算出来的每日最大限额 - 每日已申请额度
-      const applyLimit = await contract.methods.getApplyLimitAmount().call({
-        from: this.address
-      });
-      const maxAmountForDay = applyLimit[0];
-      // 获取最大总申请额度
-      let maxAmountForTotal = applyLimit[1];
-      const timestampList = await contract.methods
-        .getTimpstampListByAccount()
-        .call({
-          form: this.address
-        });
-      if (timestampList.length > 0) {
-        const getResult = timestampList.map(async item => {
-          const amount = await contract.methods.getApplyAmount(item).call({
-            from: this.address
-          });
-          const diffAmountForTotal = JSBI.subtract(
-            JSBI.BigInt(maxAmountForTotal),
-            JSBI.BigInt(amount)
-          );
-          maxAmountForTotal = diffAmountForTotal.toString();
-        });
-        await Promise.all(getResult);
-      }
-      // 如果最大总申请额度大于或等于每日最大限额，以每日最大限额为准
-      // 如果最大总申请额度小于每日最大限额，以最大总申请额度为准
-      const realMaxAmountLimit = JSBI.lessThan(
-        JSBI.BigInt(maxAmountForDay),
-        JSBI.BigInt(maxAmountForTotal)
-      )
-        ? JSBI.greaterThanOrEqual(JSBI.BigInt(maxAmountForDay), JSBI.BigInt(0))
-          ? maxAmountForDay
-          : 0
-        : JSBI.greaterThanOrEqual(
-            JSBI.BigInt(maxAmountForTotal),
-            JSBI.BigInt(0)
-          )
-        ? maxAmountForTotal
-        : 0;
-
-      // this.minApplyAmount = 1;
-      this.maxApplyAmount = weiToEther(
-        realMaxAmountLimit.toString(),
-        this.web3
-      );
       // get is in white list
       this.isWhitelist = await contract.methods.isWhitelist().call({
         from: this.address
       });
-      // this.isWhitelist =
-      //   isWhitelist &&
-      //   JSBI.greaterThan(JSBI.BigInt(applyLimit[0]), JSBI.BigInt(0)) &&
-      //   JSBI.greaterThan(JSBI.BigInt(applyLimit[1]), JSBI.BigInt(0));
-      // get dayCap
-      const dayCap = await contract.methods.dayCap().call();
-      // get dayTotalAmount
-      const dayTotalAmount = await contract.methods
-        .getApplyDayAmount(this.currentDayTimestamp)
+      // get current day timestamp
+      this.currentDayTimestamp = await contract.methods
+        .getCurrentDayTimestamp()
         .call();
-      // get apply amount
-      const currentDayApplyAmount = await contract.methods
-        .getApplyAmount(this.currentDayTimestamp)
+      // get max apply amount
+      const maxApplyAmount = await contract.methods
+        .getCanApplyDayAmount()
         .call({
           from: this.address
         });
+      this.maxApplyAmount = weiToEther(maxApplyAmount, this.web3);
       // get start time
       const startTime = await contract.methods.startTime().call({
         from: this.address
@@ -425,31 +355,6 @@ export default {
           JSBI.BigInt(this.endTime),
           JSBI.BigInt(nowTime)
         );
-      // 计算最多可申请数量
-      const remainingApplyAmount = JSBI.subtract(
-        JSBI.BigInt(dayCap),
-        JSBI.BigInt(dayTotalAmount)
-      );
-      const enableApplyAmount = JSBI.subtract(
-        JSBI.BigInt(realMaxAmountLimit.toString()),
-        JSBI.BigInt(currentDayApplyAmount)
-      );
-      this.maxApplyAmount = JSBI.lessThan(
-        remainingApplyAmount,
-        enableApplyAmount
-      )
-        ? weiToEther(
-            JSBI.greaterThanOrEqual(remainingApplyAmount, JSBI.BigInt(0))
-              ? remainingApplyAmount.toString()
-              : "0",
-            this.web3
-          )
-        : weiToEther(
-            JSBI.greaterThanOrEqual(enableApplyAmount, JSBI.BigInt(0))
-              ? enableApplyAmount.toString()
-              : "0",
-            this.web3
-          );
     },
     // 授权
     handleApprove() {
@@ -515,7 +420,7 @@ export default {
   opacity: 0.5 !important
 
 .v-btn--disabled
-  background-color: rgb(147, 185, 84) !important
-  border-color: rgb(147, 185, 84) !important
-  opacity: 0.5 !important
+  background-color: rgb(147, 185, 84)
+  border-color: rgb(147, 185, 84)
+  opacity: 0.5
 </style>

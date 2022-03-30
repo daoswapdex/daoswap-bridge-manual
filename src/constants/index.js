@@ -1,12 +1,8 @@
 export const TokenCrossChainContractAddress =
-  "0xDa3DeB342Cc4D6aD0D607F307Ecf0932f3667Ade";
+  "0xA14F44Bf2dAd772d7c275058ee3af7716F156D0C";
 
 /********** base **********/
 export const DAOAddress = "0xc096332CAacF00319703558988aD03eC6586e704";
-
-export const DATAddress = "0x738B815eaDD06E0041b52B0C9d4F0d0D277B24bA";
-
-export const DSTAddress = "0xae21384FafC42FB8FA25706CB107185a98d5CB57";
 
 export const ZeroAddress = "0x0000000000000000000000000000000000000000";
 
