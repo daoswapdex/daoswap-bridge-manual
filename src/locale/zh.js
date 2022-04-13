@@ -61,8 +61,10 @@ export default {
   "Apply Cross Chain": "跨链桥",
   "Enter the cross chain amount": "输入跨链额度",
   Apply: "申请",
+  "Authorized quota": "已授权额度",
   ApplyForm: {
     "Apply Amount": "申请额度",
+    "The amount exceeds the allowance amount": "金额超过账户授权额度",
     "The amount exceeds the balance": "金额超过可用账户余额",
     "The amount exceeds the max apply amount": "金额超过最大可申请额度",
     "The amount is be gt zero": "申请额度必须大于0",

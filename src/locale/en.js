@@ -61,8 +61,11 @@ export default {
   "Apply Cross Chain": "Bridge",
   "Enter the cross chain amount": "Enter the cross chain amount",
   Apply: "Apply",
+  "Authorized quota": "Authorized quota",
   ApplyForm: {
     "Apply Amount": "Apply Amount",
+    "The amount exceeds the allowance amount":
+      "The amount exceeds the allowance amount",
     "The amount exceeds the balance": "The amount exceeds the balance",
     "The amount exceeds the max apply amount":
       "The amount exceeds the max apply amount",

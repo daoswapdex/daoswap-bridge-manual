@@ -16,6 +16,14 @@
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text v-if="isOpen">
+                <v-card-text>
+                  <v-row align="center">
+                    <v-col class="subtitle-1" cols="12">
+                      {{ $t("Authorized quota") }}:
+                      {{ accountAssets.allowanceAmount }}
+                    </v-col>
+                  </v-row>
+                </v-card-text>
                 <form>
                   <v-card-text>
                     <v-text-field
@@ -43,14 +51,16 @@
                       :disabled="!(submitLoading && accountAssets.balance > 0)"
                       @click="
                         accountAssets.allowanceAmount &&
-                        accountAssets.allowanceAmount >= applyAmount
+                        parseFloat(accountAssets.allowanceAmount) >=
+                          parseFloat(applyAmount)
                           ? submit()
                           : handleApprove()
                       "
                     >
                       {{
                         accountAssets.allowanceAmount &&
-                        accountAssets.allowanceAmount >= applyAmount
+                        parseFloat(accountAssets.allowanceAmount) >=
+                          parseFloat(applyAmount)
                           ? $t("Apply")
                           : $t("Approve")
                       }}
@@ -233,6 +243,7 @@ export default {
     },
     address() {
       return this.$store.state.web3.address;
+      // return "0xCD4BBF4FB76d400Eab42B9e530BB98BC72fFC20E";
     },
     applyAmountErrors() {
       const errors = [];
@@ -389,24 +400,35 @@ export default {
       } else {
         this.$v.$touch();
         this.loading = true;
-        getContractByABI(
-          ApplyCrossChain_ABI,
-          TokenCrossChainContractAddress,
-          this.web3
-        )
-          .methods.applyCrossChain(etherToWei(this.applyAmount, this.web3))
-          .send({ from: this.address })
-          .then(() => {
-            this.loading = false;
-            this.operationResult.color = "success";
-            this.operationResult.snackbar = true;
-            this.operationResult.text = "Apply Cross Chain Success";
-            this.getInfo();
-          })
-          .catch(e => {
-            this.loading = false;
-            console.info(e);
-          });
+        if (
+          parseFloat(this.applyAmount) <=
+          parseFloat(this.accountAssets.allowanceAmount)
+        ) {
+          getContractByABI(
+            ApplyCrossChain_ABI,
+            TokenCrossChainContractAddress,
+            this.web3
+          )
+            .methods.applyCrossChain(etherToWei(this.applyAmount, this.web3))
+            .send({ from: this.address })
+            .then(() => {
+              this.loading = false;
+              this.operationResult.color = "success";
+              this.operationResult.snackbar = true;
+              this.operationResult.text = "Apply Cross Chain Success";
+              this.getInfo();
+            })
+            .catch(e => {
+              this.loading = false;
+              console.info(e);
+            });
+        } else {
+          this.operationResult.color = "error";
+          this.operationResult.snackbar = true;
+          this.operationResult.text =
+            "ApplyForm.The amount exceeds the allowance amount";
+          this.loading = false;
+        }
       }
     }
   }
