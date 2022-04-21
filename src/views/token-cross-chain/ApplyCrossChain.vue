@@ -207,6 +207,7 @@ export default {
     isWhitelist: false,
     startTime: 0,
     endTime: 0,
+    dayCap: 0,
     isOpen: false,
     // 提示框
     operationResult: {
@@ -348,6 +349,11 @@ export default {
       const endTime = await contract.methods.endTime().call({
         from: this.address
       });
+      // get day cap
+      const dayCap = await contract.methods.dayCap().call({
+        from: this.address
+      });
+      this.dayCap = parseFloat(weiToEther(dayCap, this.web3));
       this.startTime = JSBI.add(
         JSBI.BigInt(startTime),
         JSBI.BigInt(this.currentDayTimestamp)
@@ -365,7 +371,8 @@ export default {
         JSBI.greaterThanOrEqual(
           JSBI.BigInt(this.endTime),
           JSBI.BigInt(nowTime)
-        );
+        ) &&
+        this.dayCap > 0;
     },
     // 授权
     handleApprove() {
