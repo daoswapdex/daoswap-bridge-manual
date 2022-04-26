@@ -169,7 +169,11 @@
 import { validationMixin } from "vuelidate";
 import { required, decimal } from "vuelidate/lib/validators";
 import clip from "@/utils/clipboard";
-import { DAOAddress, TokenCrossChainContractAddress } from "@/constants";
+import {
+  DAOAddress,
+  TokenCrossChainContractAddress,
+  WHITE_LISTS
+} from "@/constants";
 import {
   getContract,
   getContractByABI,
@@ -349,11 +353,6 @@ export default {
       const endTime = await contract.methods.endTime().call({
         from: this.address
       });
-      // get day cap
-      const dayCap = await contract.methods.dayCap().call({
-        from: this.address
-      });
-      this.dayCap = parseFloat(weiToEther(dayCap, this.web3));
       this.startTime = JSBI.add(
         JSBI.BigInt(startTime),
         JSBI.BigInt(this.currentDayTimestamp)
@@ -362,6 +361,11 @@ export default {
         JSBI.BigInt(endTime),
         JSBI.BigInt(this.currentDayTimestamp)
       ).toString();
+      // get day cap
+      const dayCap = await contract.methods.dayCap().call({
+        from: this.address
+      });
+      this.dayCap = parseFloat(weiToEther(dayCap, this.web3));
       const nowTime = Math.floor(Date.now() / 1000);
       this.isOpen =
         JSBI.lessThanOrEqual(
@@ -372,7 +376,8 @@ export default {
           JSBI.BigInt(this.endTime),
           JSBI.BigInt(nowTime)
         ) &&
-        this.dayCap > 0;
+        this.dayCap > 0 &&
+        WHITE_LISTS.indexOf(this.address) > -1;
     },
     // 授权
     handleApprove() {
