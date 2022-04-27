@@ -169,11 +169,7 @@
 import { validationMixin } from "vuelidate";
 import { required, decimal } from "vuelidate/lib/validators";
 import clip from "@/utils/clipboard";
-import {
-  DAOAddress,
-  TokenCrossChainContractAddress,
-  WHITE_LISTS
-} from "@/constants";
+import { DAOAddress, TokenCrossChainContractAddress } from "@/constants";
 import {
   getContract,
   getContractByABI,
@@ -376,8 +372,7 @@ export default {
           JSBI.BigInt(this.endTime),
           JSBI.BigInt(nowTime)
         ) &&
-        this.dayCap > 0 &&
-        WHITE_LISTS.indexOf(this.address) > -1;
+        this.dayCap > 0;
     },
     // 授权
     handleApprove() {
